@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#$ -N scite-dvh0309
+#$ -o /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/03and09/scitelog-dvh-0309.txt
+#$ -e /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/03and09/scitelog-dvh-0309.txt
+#$ -P Bal_sturkars
+#$ -pe serial 16
+#$ -q baliga
+#$ -S /bin/bash
+#$ -m abe
+#$ -M sturkarslan@systemsbiology.org
+
+cd /users/sturkars/github/SCITE/
+
+./scite -i /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/03and09/dvh-UA3-152-03and09_2ca80p2cenoan_mutation_matrix.txt -names /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/03and09/dvh-UA3-152-03and09_2ca80p2cenoan_mutation_names.txt -n 202 -m 188 -r 1 -l 900000 -fd 6.04e-5 -ad 0.21545 0.21545 -a -e 0.7 -max_treelist_size 5 -p 5 -s -g 1
