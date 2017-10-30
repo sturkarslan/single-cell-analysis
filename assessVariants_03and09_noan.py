@@ -12,7 +12,7 @@
 
 
 from __future__ import division
-import glob
+import glob, sys
 
 folders = glob.glob("results-0*/dvh/DvH*/")
 variantFile = "dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
