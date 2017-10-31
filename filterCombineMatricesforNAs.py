@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 
 # load variant files
-variantfiles = glob.glob("dvh-UA3-152-*_noan_mutation_counts_verified.txt")
-cellfilters = [50,40, 30]
+variantfiles = glob.glob("dvh-UA3-152-09_noan_mutation_counts_verified.txt")
+cellfilters = [30]
 
 for cellfilter in cellfilters:
 

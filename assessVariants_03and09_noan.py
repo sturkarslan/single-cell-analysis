@@ -14,7 +14,7 @@
 from __future__ import division
 import glob, sys
 
-folders = glob.glob("results-0*/dvh/DvH*/")
+folders = glob.glob("results-0/dvh/DvH*/")
 variantFile = "dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
 fastaFile = "reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
 outfile = 'dvh-UA3-152-03and09_noan_mutation_counts_verified.txt'
