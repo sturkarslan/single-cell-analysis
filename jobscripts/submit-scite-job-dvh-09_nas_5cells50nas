@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#$ -N scite-09-5c50n
+#$ -o /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/scitelog-dvh-09-5cells_na50cells.txt
+#$ -e /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/scitelog-dvh-09-5cell_na50cells.txt
+#$ -P Bal_sturkars
+#$ -pe serial 16
+#$ -q baliga
+#$ -S /bin/bash
+#$ -m abe
+#$ -M sturkarslan@systemsbiology.org
+
+cd /users/sturkars/github/SCITE/
+
+./scite -i /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_50nas_mutation_matrix.txt -names /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_50nas_mutation_names.txt -n 57 -m 94 -r 1 -l 900000 -fd 6.04e-5 -ad 0.21545 0.21545 -a -e 0.7
