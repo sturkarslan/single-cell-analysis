@@ -13,11 +13,13 @@ import matplotlib.pyplot as plt
 
 # load variant files
 variantfiles = glob.glob("dvh-UA3-152-*_noan_mutation_counts_verified.txt")
-cellfilters = [5,10]
+cellfilters = [5]
 
 for cellfilter in cellfilters:
 
     for variantfile in variantfiles:
+        print
+        print(variantfile)
         samplename = variantfile.split("_")[0]
         cellsfile = samplename + "_noan_mutation_counts_verified_" + str(cellfilter) + "cells.txt"
 
@@ -52,14 +54,14 @@ for cellfilter in cellfilters:
             fields[-1] = fields[-1].replace('\n','')
             matrixonly = fields[1:len(fields)]
             #matrixonly = matrixonly.pop(0)
-            print(fields)
-            print(matrixonly)
+            #print(fields)
+            #print(matrixonly)
             name = fields[0]
 
             # count 1s in the line
-            present = sum(e.count("1") for e in fields)
-            absent = sum(e.count("0") for e in fields)
-            na = sum(e.count("3") for e in fields)
+            present = sum(e.count("1") for e in matrixonly)
+            absent = sum(e.count("0") for e in matrixonly)
+            na = sum(e.count("3") for e in matrixonly)
             print("Name: %s, Present: %s, Absent: %s, NA: %s \n" %(name, present, absent, na)) 
             presents.append(present)
             absents.append(absent)
@@ -68,10 +70,13 @@ for cellfilter in cellfilters:
             # filter for mutations that are in at least 5 cells
             if(present >= cellfilter):
                 mutations.append(name)
+                print("Mutation occur in equal or more than %s cells\n" %cellfilter)
                 vwrite = "\t".join(fields) + "\n"
                 vvwrite = "\t".join(matrixonly) + "\n"
                 v.write(vwrite)
                 k.write(vvwrite)
+            else:
+                print("Mutation DOES NOT happen in equal or %s cells\n" %cellfilter)
 
 
         # ## write variants into mutation names file
@@ -93,8 +98,8 @@ for cellfilter in cellfilters:
         s.write(swrite)
         s.close()
 
-        plt.hist(nas)
-        plt.ylabel('Cells')
-        plt.title('Present')
-        plt.show()
+#        plt.hist(nas)
+#        plt.ylabel('Cells')
+#        plt.title('Present')
+#        plt.show()
 

@@ -12,4 +12,4 @@
 
 cd /users/sturkars/github/SCITE/
 
-./scite -i /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-03_noan_mutation_counts_verified_5cells_mutation_matrix.txt -names /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-03_noan_mutation_counts_verified_5cells_mutation_names.txt -n 56 -m 94 -r 1 -l 900000 -fd 6.04e-5 -ad 0.21545 0.21545 -a -e 0.7
+./scite -i /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-03_noan_mutation_counts_verified_5cells_mutation_matrix.txt -names /proj/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-03_noan_mutation_counts_verified_5cells_mutation_names.txt -n 42 -m 94 -r 1 -l 900000 -fd 6.04e-5 -ad 0.21545 0.21545 -a -e 0.7

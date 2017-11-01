@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 # load variant files
 variantfiles = glob.glob("dvh-UA3-152-*_noan_mutation_counts_verified.txt")
-cellfilters = [5,10]
+cellfilters = [5]
 nasfilter = [50]
 
 for cellfilter in cellfilters:
@@ -58,9 +58,9 @@ for cellfilter in cellfilters:
             name = fields[0]
 
             # count 1s in the line
-            present = sum(e.count("1") for e in fields)
-            absent = sum(e.count("0") for e in fields)
-            na = sum(e.count("3") for e in fields)
+            present = sum(e.count("1") for e in matrixonly)
+            absent = sum(e.count("0") for e in matrixonly)
+            na = sum(e.count("3") for e in matrixonly)
             print("Name: %s, Present: %s, Absent: %s, NA: %s \n" %(name, present, absent, na)) 
             presents.append(present)
             absents.append(absent)
