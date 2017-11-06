@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 
 # load variant files
-variantfiles = glob.glob("dvh-UA3-152-*_noan_mutation_counts_verified.txt")
+variantfiles = glob.glob("dvh-UA3-152-03_noan_mutation_counts_verified.txt")
 cellfilters = [5]
 nasfilter = [50]
 
@@ -93,9 +93,9 @@ for cellfilter in cellfilters:
         swrite = "\t".join(cellheader) + "\n"
         s.write(swrite)
         s.close()
-
-        plt.hist(nas)
-        plt.ylabel('Cells')
-        plt.title('Present')
-        plt.show()
+#
+#        plt.hist(nas)
+#        plt.ylabel('Cells')
+#        plt.title('Present')
+#        plt.show()
 
