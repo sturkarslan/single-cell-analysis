@@ -251,21 +251,37 @@ def parseCounts():
         line2write = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tStatus:\t%s\t%s\t%s\ttopbase:%s\tproportion:%s\n" %(chromosome, coordinate, referenceDepth, baseA, baseC, baseG, baseT, baseIN, status, alternativeCount, nstatus, topbase, proportion)
         h.write(line2write)
 
-# get variables from command line argument
-folder = sys.argv[1]
-print(folder)
-bamFile = sys.argv[2]
-countFile = sys.argv[3]
-resultFile = sys.argv[4]
-print("Processing %s... " %(folder)) 
-print
-bamFile = glob.glob(folder + "*_marked.bam")[0]
-sample = bamFile.split("_marked.bam")[0]
-print
-print("Running bamreadcount on %s" %(folder)) 
-print
-runBamReadCount()
-print
-print("Parsing bamreadcounts in %s" %(folder)) 
-print
-parseCounts()
+paths = ["/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
+         "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
+         "/proj/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
+         "/proj/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+
+folders = []
+for path in paths:
+    folder = glob.glob(path)
+    folders.append(folder)
+# create a flat list out of nsted lists
+folderlist = [item for sublist in folders for item in sublist]
+
+for folder in folderlist:
+    print("--------------------%s/%s-------------------- %(n,totalfolders)") 
+    print("Processing %s... %(folder)") 
+    print
+    #get count file
+    bamFile = glob.glob(folder + "*_marked.bam")[0]
+    print(bamFile)
+    sample = bamFile.split("_marked.bam")[0]
+    countFile = sample + "_allsamples_bamreadcount.txt"
+    #jobscriptfile = sample + "_jobscript.csh"
+    #logfile = sample + "_jobscriptlog.txt"
+    resultFile = countFile.split("_allsamples_bamreadcount.txt")[0] + "_allsamples_bamreadcount_parsed.txt"
+    
+    print
+    print("Running bamreadcount on %s" %(folder)) 
+    print
+    runBamReadCount()
+    print
+    print("Parsing bamreadcounts in %s" %(folder)) 
+    print
+    parseCounts()
+    sys.exit()
