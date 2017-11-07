@@ -251,10 +251,11 @@ def parseCounts():
         line2write = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tStatus:\t%s\t%s\t%s\ttopbase:%s\tproportion:%s\n" %(chromosome, coordinate, referenceDepth, baseA, baseC, baseG, baseT, baseIN, status, alternativeCount, nstatus, topbase, proportion)
         h.write(line2write)
 
-paths = ["/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
-         "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
-         "/proj/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
-         "/proj/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+paths = [#"/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
+         #"/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
+         "/proj/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/"
+         #"/proj/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+         ]
 
 folders = []
 for path in paths:
