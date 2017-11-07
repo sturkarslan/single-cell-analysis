@@ -10,7 +10,7 @@ import glob, sys, os, string, subprocess
 
 def runBamReadCount():
     program = "~/github/bam-readcount/bin/bam-readcount"
-    parameters = "-q 0 -w 5"
+    parameters = "-q 0 -w 0"
     # check the header of bam file and inspect which chromosome name is defined
     cmd0 = "samtools idxstats %s | cut -f 1 | head -1" %(bamFile)
     pipe = subprocess.Popen(cmd0, shell=True, stdout=PIPE).stdout
@@ -284,4 +284,4 @@ for folder in folderlist:
     print("Parsing bamreadcounts in %s" %(folder)) 
     print
     parseCounts()
-    sys.exit()
+    #sys.exit()
