@@ -24,7 +24,7 @@ def runBamReadCount():
         fastaFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
          # file to get list of all variants in all single cells
         variantFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
-        print(bamheader, fastaFile)
+    print(bamheader, fastaFile)
 
     cmd = "%s %s -l %s -f %s %s > %s" %(program,parameters,variantFile,fastaFile,bamFile, countFile)
     print(cmd)
