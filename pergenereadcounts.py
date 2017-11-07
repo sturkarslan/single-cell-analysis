@@ -36,5 +36,5 @@ bamfilelist = glob.glob("/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-sin
 bamfiles = " ".join(bamfilelist)
 cmd = "bedtools multicov -bams %s -bed %s > %s" %(bamfiles,gtfFile,resultsFile)
 print(cmd)
-#os.system(cmd)
+os.system(cmd)
 
