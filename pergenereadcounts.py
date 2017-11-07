@@ -7,15 +7,6 @@ Created on Tue Nov  7 11:23:44 2017
 """
 import glob, sys, os
 
-
-def runBamReadCount():
-    program = "~/github/bam-readcount/bin/bam-readcount"
-    parameters = "-q 0 -w 0"
-    cmd = "%s %s -l %s -f %s %s > %s" %(program,parameters,variantFile,fastaFile,bamFile, countFile)
-    print(cmd)
-    print
-    os.system(cmd)
-
 # -----------------//----------------------
 gtfFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.gtf"
 
