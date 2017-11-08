@@ -14,18 +14,18 @@ from __future__ import division
 import glob, sys, os, string, csv, itertools
 #import pandas as pd
 
-variantFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
-fastaFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
-outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
-mutationnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
-cellnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
-mutationmatrix = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
+variantFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
+fastaFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
+outfile = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
+mutationnames = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
+cellnames = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
+mutationmatrix = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
 
 ## paths for all sample folders
-paths = ["/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
-         "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
-         "/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
-         "/Volumes/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+paths = ["/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
+         "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
+         "/proj/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
+         "/proj/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
 # create a list of all folders from these paths
 folders = []
 for path in paths:
@@ -125,9 +125,16 @@ for variant2 in variantList:
             k = open(consensusVariant, 'r')
             for line in k:
                 row = line.split("\t")
-                chromosome = row[0]
+                chromosome1 = row[0]
+                if chromosome1 == "NC_002937":
+                    chromosome = "Chromosome"
+                elif chromosome1 == "NC_005863":
+                    chromosome = "pDV"
+                else:
+                    chromosome = chromosome1
                 coord = row[1]
                 reference = row[2]
+                alt = row[15]
                 joint = "%s-%s-%s" %(chromosome, coord, reference)
                 consensusList.append(joint)
 
@@ -136,20 +143,30 @@ for variant2 in variantList:
             g = open(resultFile, 'r')
             for line in g:
                 row = line.split("\t")
-                chromosome = row[0]
+                chromosome1 = row[0]
+                if chromosome1 == "NC_002937":
+                    chromosome = "Chromosome"
+                elif chromosome1 == "NC_005863":
+                    chromosome = "pDV"
+                else:
+                    chromosome = chromosome1
                 coord = row[1]
                 reference = row[2]
+                alt = row[10]
                 status = row[11]
                 joint2 = "%s-%s-%s" %(chromosome, coord, reference)
                 joint2 = joint2.split(":")[0]
-                countDict[joint2] = status
+                summary = reference + "|" + alt + "|" + status
+                countDict[joint2] = summary
             keylist = list(countDict.keys())
+            #print(keylist)
 
             # check variants if they are in consensus, if not check in bam counts if not assign 3 (NA)
+            print(variant)
             if variant in consensusList:
-                status = "1"
+                status = countDict[variant] #+ "|1"
             elif variant in keylist:
-                status = countDict[variant]
+                status = countDict[variant] #+ "|0"
             else:
                 status = "3"
 

@@ -1,7 +1,7 @@
-# Run bam readcpunt for all mutations that will be used in final analysis 
+# Run bam readcpunt for all mutations that will be used in final analysis
 # and to make sure to record mutation status
 
- 
+
 
 from __future__ import division
 from subprocess import Popen, PIPE, STDOUT
@@ -19,7 +19,7 @@ def runBamReadCount():
     if bamheader == "NC_005863\n":
         fastaFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.newname.fasta"
         # file to get list of all variants in all single cells
-        variantFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
+        variantFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-newbed.txt"
     else:
         fastaFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
          # file to get list of all variants in all single cells
@@ -64,7 +64,7 @@ def parseCounts():
             percentIN = 0
 
         print(depth1)
-        print("A:%s - C:%s - G:%s - T:%s - INS:%s" %(percentA,percentC,percentG,percentT,percentIN)) 
+        print("A:%s - C:%s - G:%s - T:%s - INS:%s" %(percentA,percentC,percentG,percentT,percentIN))
 
         mylist = [percentA, percentC, percentG, percentT, percentIN]
         highest = max(mylist)
@@ -94,7 +94,7 @@ def parseCounts():
 
             if topbase == reference:
                 print("Top hit is reference")
-                print("PercentINT is %s" %percentIN) 
+                print("PercentINT is %s" %percentIN)
                 if percentIN < 0.5:
                     nstatus = 0
                     proportion = "%s" %(highest)
@@ -264,9 +264,11 @@ for path in paths:
 # create a flat list out of nsted lists
 folderlist = [item for sublist in folders for item in sublist]
 
+n = 1
+totalfolders = len(folderlist)
 for folder in folderlist:
-    print("--------------------%s/%s-------------------- %(n,totalfolders)") 
-    print("Processing %s... %(folder)") 
+    print("--------------------%s/%s--------------------" %(n,totalfolders))
+    print("Processing %s... " %(folder))
     print
     #get count file
     bamFile = glob.glob(folder + "*_marked.bam")[0]
@@ -276,13 +278,14 @@ for folder in folderlist:
     #jobscriptfile = sample + "_jobscript.csh"
     #logfile = sample + "_jobscriptlog.txt"
     resultFile = countFile.split("_allsamples_bamreadcount.txt")[0] + "_allsamples_bamreadcount_parsed.txt"
-    
+
     print
-    print("Running bamreadcount on %s" %(folder)) 
+    print("Running bamreadcount on %s" %(folder))
     print
     runBamReadCount()
     print
-    print("Parsing bamreadcounts in %s" %(folder)) 
+    print("Parsing bamreadcounts in %s" %(folder))
     print
     parseCounts()
+    n = n + 1
     #sys.exit()
