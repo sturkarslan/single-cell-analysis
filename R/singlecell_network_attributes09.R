@@ -90,10 +90,10 @@ for(i in 1:length(dvhUA3.isolates$V1)){
 dvh09.isolates = dvhUA3.isolates[which(dvhUA3.isolates$line == "UA3" & dvhUA3.isolates$epd == "09"),]
 
 # read mutation matrix
-dvh09.matrix = read.delim("/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_mutation_matrix.txt", sep="\t", header=F, stringsAsFactors = F)
+dvh09.matrix = read.delim("/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_50nas_mutation_matrix.txt", sep="\t", header=F, stringsAsFactors = F)
 
 # read mutation names
-dvh09.names = read.delim("/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_mutation_names.txt", sep="\t", header=F)
+dvh09.names = read.delim("/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_mutation_counts_verified_5cells_50nas_mutation_names.txt", sep="\t", header=F)
 
 
 
@@ -241,4 +241,4 @@ for(name in c(dvh09.names)[[1]]){
   
 }
 
-write.table(dvh09.features, file="/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_5cells_mutation_names-network-attributes.txt", sep="\t", row.names=F, quote=F)
+write.table(dvh09.features, file="/Volumes/omics4tb/sturkarslan/scite_single_cells_syntrophy/dvh-UA3-152-09_noan_5cells_50nas_network-attributes.txt", sep="\t", row.names=F, quote=F)

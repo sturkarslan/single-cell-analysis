@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov 13 10:25:19 2017
+Scan through pergene count file from bam files and finds genes which give
+consistent counts across samples
+@author: sturkars
+"""
+import sys
+
+countfile = "/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/pergenecoverage_all_geneonly.txt"
+resultsfile = "/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/pergenecoverage_geneonly_stats.txt"
+
+f = open(countfile, 'r')
+h = open(resultsfile, 'w')
+
+alllines = []
+for line in f:
+    linecounts = []
+    fields = line.split("\t")
+    fields[-1] = fields[-1].replace('\n','')
+    names0 = fields[8]
+    names1 = names0.split(";")[0].split(" ")[1].replace("\"", "")
+    countsonly = fields[9:len(fields)]
+    
+    largerthan5 = 0
+    for count in countsonly:
+        if int(count) > 5:
+            largerthan5 = largerthan5 + 1
+      
+    linecounts = names1 + "\t" + str(largerthan5)
+    alllines.append(linecounts.split("\t"))
+    
+sortedlines = sorted(alllines, key=lambda counts: int(counts[1]), reverse=True)    
+
+for sline in sortedlines:
+    line2write = "\t".join(sline)
+    h.write(line2write)
+    h.write("\n")
+    #sys.exit()
+h.close()

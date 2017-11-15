@@ -11,21 +11,26 @@
 # this script works on merged files to verify mutations in all samples.
 ###############################################################################
 from __future__ import division
-import glob, sys, os, string, csv, itertools
+import glob, sys
 #import pandas as pd
 
-variantFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
-fastaFile = "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
-outfile = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
-mutationnames = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
-cellnames = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
-mutationmatrix = '/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
+variantFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
+fastaFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
+outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
+mutationnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
+cellnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
+mutationmatrix = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
 
-## paths for all sample folders
-paths = ["/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
-         "/proj/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
-         "/proj/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
-         "/proj/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+# test
+#paths = ["/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03_11*/"]
+
+# paths for all sample folders
+paths = [#"/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
+         #"/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
+         #"/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
+         "/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/dvh/*/"]
+         #"/Volumes/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+
 # create a list of all folders from these paths
 folders = []
 for path in paths:
@@ -34,7 +39,6 @@ for path in paths:
 # create a flat list out of nested lists
 folderlist = [item for sublist in folders for item in sublist]
 
-
 # file to get list of all variants in all single cells
 # count files
 print("Procesing counts files...\n")
@@ -42,7 +46,6 @@ countfiles = []
 for folder in folderlist:
     myfile = glob.glob(folder + "*_allsamples_bamreadcount.txt")
     countfiles.append(myfile)
-#print(countfiles)
 
 # Open variant file and loop through each variant to create a variantList
 print("Procesing variants file...\n")
@@ -63,10 +66,17 @@ v = open(mutationmatrix, 'w') ## open matrix output only file for writing
 h = open(outfile, 'w') ##open output file for matrix and cel and mutation names
 headerlist = []
 headerlist.append("Variant")
-#headerlist.append("Name")
+
 for cfile in countfiles:
-    #print(cfile)
-    headername = cfile[0].split("/")[3].split("_allsamples_bamreadcount_parsed.txt")[0]
+    if cfile[0].split("/")[6] == "dvh":
+        headername = cfile[0].split("/")[7].split("_allsamples_bamreadcount_parsed.txt")[0] + "-" + cfile[0].split("/")[4].split("_allsamples_bamreadcount_parsed.txt")[0]
+        
+    if cfile[0].split("/")[7] == "dvh":
+        headername = cfile[0].split("/")[8].split("_allsamples_bamreadcount_parsed.txt")[0].split("-")[0]
+     
+    if cfile[0].split("/")[6] == "after_300g":
+        headername = cfile[0].split("/")[9].split("_allsamples_bamreadcount_parsed.txt")[0].split("_")[0]
+    
     #print(headername)
     headerlist.append(headername)
 headerlist.append("\n")
@@ -95,31 +105,29 @@ n = 1
 # loop through each variant and search each count file to collect mutations status
 for variant2 in variantList:
     totalvariants = len(variantList)
-    print("--------------------%s/%s--------------------") %(n,totalvariants)
-    print("Processing %s...") %(variant2)
+    print("--------------------%s/%s--------------------" %(n,totalvariants)) 
+    print("Processing %s..." %(variant2)) 
     print
     statusList = []
     matrixList = []
     variant = variant2.split("_")[0]
+    variant2 = variant2.replace("\n", "")
     statusList.append(variant2)
-    #print(statusList)
-
+    
     # loop through each single cell folder to read bmreadcount files and parse
     m = 1
     totalfolders = len(folderlist)
     for folder in folderlist:
-            print("----------%s/%s----------") %(m,totalfolders)
-            print("Processing %s...") %(folder)
+            print("----------%s/%s----------" %(m,totalfolders)) 
+            print("Processing %s..." %(folder)) 
             print
             # get count file
             bamFile = glob.glob(folder + "*_marked.bam")[0]
             consensusVariant = glob.glob(folder + "*consensus.variants.FINAL.txt")[0]
-            #print(bamFile, variantFile)
             sample = bamFile.split("_marked.bam")[0]
             countFile = sample + "_allsamples_bamreadcount.txt"
             resultFile = countFile.split("_allsamples_bamreadcount.txt")[0] + "_allsamples_bamreadcount_parsed.txt"
-            #print(consensusVariant)
-
+            
             # create a list of variants from consesnus variant calls for each folder
             consensusList = []
             k = open(consensusVariant, 'r')
@@ -134,49 +142,84 @@ for variant2 in variantList:
                     chromosome = chromosome1
                 coord = row[1]
                 reference = row[2]
-                alt = row[15]
+                #alt = row[15]
                 joint = "%s-%s-%s" %(chromosome, coord, reference)
                 consensusList.append(joint)
+            
 
             # create a dictionary of mutations as keys and status as values
             countDict = {}
             g = open(resultFile, 'r')
             for line in g:
-                row = line.split("\t")
-                chromosome1 = row[0]
+                row1 = line.split("\t")
+                chromosome1 = row1[0]
                 if chromosome1 == "NC_002937":
                     chromosome = "Chromosome"
                 elif chromosome1 == "NC_005863":
                     chromosome = "pDV"
                 else:
                     chromosome = chromosome1
-                coord = row[1]
-                reference = row[2]
-                alt = row[10]
-                status = row[11]
+                coord = row1[1]
+                reference = row1[2]
+                alt = row1[10]
+                status = row1[11]
+                ins = row1[7]
                 joint2 = "%s-%s-%s" %(chromosome, coord, reference)
+                rcount = str(reference.split(":")[1])
                 joint2 = joint2.split(":")[0]
-                summary = reference + "|" + alt + "|" + status
+                summary = reference + "|" + alt + "|" + ins + "|" + rcount + "|" + status
                 countDict[joint2] = summary
             keylist = list(countDict.keys())
             #print(keylist)
 
             # check variants if they are in consensus, if not check in bam counts if not assign 3 (NA)
             print(variant)
+            ## mutations is called by callers
             if variant in consensusList:
-                status = countDict[variant] #+ "|1"
+                status = countDict[variant] + "|1"
+                print("%s in consensusList" %variant)
+            
+            # mutation is not    
             elif variant in keylist:
-                status = countDict[variant] #+ "|0"
+                print("%s in keyList" %variant)
+                verify = int(countDict[variant].split("|")[3])
+                if verify >= 5:
+                    print("%s is higher than 5" %verify)
+                    status = countDict[variant] + "|0"
+                else:
+                    status = countDict[variant] + "|3"
+                    print("%s is LOWER than 5" %verify)
+                
+            # mutation can not be called
             else:
                 status = "3"
-
+            
+            ## Do mutation presence/absence calls agree?
+            if status == "3":
+                status = "3"
+            else:
+                verify1 = status.split("|")[4]
+                verify2 = status.split("|")[5]
+            if verify1 == verify2:
+                status = status + "|OK"
+            else:
+                status = status + "|CHECK"
+            
             m = m + 1
             statusList.append(status)
             matrixList.append(status)
-            sys.exit()
+    #sys.exit()
     n = n + 1
     #print(statusList)
-    line2write = "\t".join(statusList) + "\n" ## for matrix and names
-    vwrite = "\t".join(matrixList) + "\n" ## for matrix ony
+    #statusList.append("\n")
+    #print(statusList[0:3])
+    line2write = "\t".join(statusList)
+    line2write = line2write + "\n"
+    #print(line2write)
     h.write(line2write)
+    ## for matrix and names
+    vwrite = "\t".join(matrixList) + "\n" ## for matrix ony
+  
     v.write(vwrite)
+h.close()
+v.close()
