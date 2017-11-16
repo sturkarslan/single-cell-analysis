@@ -12,21 +12,21 @@ import matplotlib.pyplot as plt
 
 
 # load variant files
-variantfiles = glob.glob("dvh-UA3-152-03_noan_mutation_counts_verified.txt")
-cellfilters = [5]
+variantfiles = glob.glob("/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-*_curated.txt")
+cellfilters = [1,2,5]
 nasfilter = [50]
 
 for cellfilter in cellfilters:
 
     for variantfile in variantfiles:
         samplename = variantfile.split("_")[0]
-        cellsfile = samplename + "_noan_mutation_counts_verified_" + str(cellfilter) + "cells_50nas.txt"
+        cellsfile = samplename + "_SC_curated_" + str(cellfilter) + "cells.txt"
 
-        mutationnames = samplename + "_noan_mutation_counts_verified_" + str(cellfilter) + "cells_50nas_mutation_names.txt"
+        mutationnames = samplename + "_SC_curated_" + str(cellfilter) + "cells_mutation_names.txt"
 
-        cellnames = samplename + "_noan_mutation_counts_verified_" + str(cellfilter) + "cells_50nas_cell_names.txt"
+        cellnames = samplename + "_SC_curated_" + str(cellfilter) + "cells_cell_names.txt"
 
-        matrixfile = samplename + "_noan_mutation_counts_verified_" + str(cellfilter) + "cells_50nas_mutation_matrix.txt"
+        matrixfile = samplename + "_SC_curated_" + str(cellfilter) + "cells_mutation_matrix.txt"
 
         # Open variant file and loop through each variant to create a variantList
         print("Procesing variants file %s...\n"  %(variantfile))
@@ -67,13 +67,13 @@ for cellfilter in cellfilters:
             nas.append(na)
 
             # filter for mutations that are in at least 5 cells
-            if(present >= cellfilter and na <= 50):
+            if(present >= cellfilter):
                 mutations.append(name)
                 vwrite = "\t".join(fields) + "\n"
                 vvwrite = "\t".join(matrixonly) + "\n"
                 v.write(vwrite)
                 k.write(vvwrite)
-
+        k.close()     
 
         # ## write variants into mutation names file
         t = open(mutationnames, 'w')
@@ -82,6 +82,7 @@ for cellfilter in cellfilters:
             mutationShort = mutationShort.replace("pDV", "p")
             mutationShort = mutationShort.replace("DVU_", "DVU")
             mutationShort = mutationShort.split("_")[1] + "_" + mutationShort.split("-")[1] + mutationShort.split("-")[0]
+            #mutationShort = mutationShort.split("_")[1] + "_" + mutationShort.split("-")[1] + mutationShort.split("-")[0]
             t.write(mutationShort)
             t.write("\n")
         t.close()
