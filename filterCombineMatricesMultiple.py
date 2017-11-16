@@ -7,12 +7,11 @@
 ###############################################################################
 
 from __future__ import division
-import glob, sys, os, string, csv, itertools
-import matplotlib.pyplot as plt
+import glob
 
 
 # load variant files
-variantfiles = glob.glob("/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-*_curated.txt")
+variantfiles = glob.glob("/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-*_curated.txt")
 cellfilters = [1,2,5]
 nasfilter = [50]
 
