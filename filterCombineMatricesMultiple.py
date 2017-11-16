@@ -69,11 +69,12 @@ for cellfilter in cellfilters:
             # filter for mutations that are in at least 5 cells
             if(present >= cellfilter):
                 mutations.append(name)
-                vwrite = "\t".join(fields) + "\n"
-                vvwrite = "\t".join(matrixonly) + "\n"
-                v.write(vwrite)
-                k.write(vvwrite)
-        k.close()     
+                fieldsString = "\t".join(fields)
+                print(fieldsString)
+                v.write("{}\n".format(fieldsString))
+                matrixString = "\t".join(matrixonly)
+                k.write("{}\n".format(matrixString))
+             
 
         # ## write variants into mutation names file
         t = open(mutationnames, 'w')
@@ -94,6 +95,7 @@ for cellfilter in cellfilters:
         swrite = "\t".join(cellheader) + "\n"
         s.write(swrite)
         s.close()
+        k.close()
 #
 #        plt.hist(nas)
 #        plt.ylabel('Cells')
