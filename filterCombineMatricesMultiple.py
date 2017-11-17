@@ -12,7 +12,7 @@ import glob
 
 # load variant files
 variantfiles = glob.glob("/proj/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-*_curated.txt")
-cellfilters = [1,2,5]
+cellfilters = [2,5]
 nasfilter = [50]
 
 for cellfilter in cellfilters:
