@@ -8,46 +8,169 @@ from __future__ import division
 import glob, sys
 #import pandas as pd
 
-outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecell.txt'
+outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecell_mmp.txt'
+outfile2 = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecell_collated_mmp.txt'
 
 # paths for all sample folders
-paths = [#"/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
-         "/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/dvh/*/"]
-         #"/Volumes/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+paths = ["/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/mmp/*/",
+         "/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/mmp/*/",
+         "/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/*/",
+         "/Volumes/omics4tb/sturkarslan/syntrophy_raw_sequences/1000-gen/results/mmp/*/"]
 
 # create a list of all folders from these paths
 folders = []
 for path in paths:
     folder = glob.glob(path)
     folders.append(folder)
-# create a flat list out of nested lists
-folderlist = [item for sublist in folders for item in sublist]
 
+## Remove unwanted folders from the list
+exception = ["AK_43", "AK_44", "AK_47", "AK_48", "AK_49"]
+exceptionfull = ["/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/" + i + "/" for i in exception ]    
+# create a flat list out of nested lists
+folderlistfull = [item for sublist in folders for item in sublist]
+folderlist = [j for j in folderlistfull if j not in exceptionfull]
 # file to get list of all variants in all single cells
 # count files
 print("Procesing counts files...\n")
 
+# function to calculate means for frequencies
+def mean(numbers):
+    return round(float(sum(numbers)) / max(len(numbers), 1), 2)
 
 h = open(outfile, 'w')
+samplenames = []
 #countfiles = []
 for folder in folderlist:
     variantfile = glob.glob(folder + "*.consensus.variants.FINAL.txt")
-    samplename = variantfile[0].split("/")[8]
+    samplename = variantfile[0].split("/")[-2]
+    experiment = variantfile[0].split("/")[-5]
+    if experiment == "after_300g":
+        samplenameCut = samplename.split("_")[0] 
+        samplenameClean = "EG_" + samplenameCut
+    elif experiment == "EPD_seq":
+        samplenameClean = "EP_" + samplename
+    elif experiment == "clonal-isolates":
+        samplenameClean = "CI_" + samplename
+    elif experiment == "1000-gen":
+        samplenameClean = "TG_" + samplename
+    else:
+        samplenameClean = samplename
+        
     f = open(variantfile[0], 'r')
     # loop through each line
     for line in f:
         fields = line.split("\t")
         chromosome = fields[0]
+        chromosome = chromosome.replace("Chromosome", "Chr")
         coordinate = fields[1]
-        alternative = fields[4]
+        alternative = fields[2]
+        
+        sysname = fields[10]
+        if sysname == "":
+            locus = "IG"
+        else:
+            locus = sysname.replace("DVU_", "DVU")
+        
         programs = fields[13]
-        frequencies = fields[14]
-        variantname = "%s-%s-%s" %(chromosome,coordinate,alternative)
+        
+        variantname = "%s-%s-%s" %(chromosome,locus,coordinate)
         programcount = len(programs.split(":"))
         print(programs, programcount)
-        line2write = variantname + "\t" + samplename + "\t" + line
-        h.write(line2write)
+        
+        if programcount >= 2:
+            line2write = variantname + "\t" + experiment + "\t" + samplenameClean + "\t" + line
+            h.write(line2write)
+            samplenames.append(samplenameClean)
 h.close()    
+
+
+## create a matrix of mutation frequencies per sample
+matrixfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecells_matrix_mmp.txt'
+f = open(outfile, 'r')
+g = open(matrixfile, 'w')
+variants = []
+samples = []
+frequencies = []
+variantsDict = {}
+for line in f:
+    fields = line.split("\t")
+    variantid = fields[0]
+    samplename = fields[2]
+    
+    frequencies = fields[17]
+    frequencies = frequencies.replace("%", "")
+    frequencies = list(frequencies.split(":"))
+    #convert to float
+    frequencies = [float(i) for i in frequencies]
+    meanFreq = mean(frequencies)
+    variantsDict[(variantid, samplename)] = meanFreq
+    variants.append(variantid)
+    samples.append(samplename)
+# get list of keys to check if sample/variant exists    
+keylist = list(variantsDict.keys())
+
+# write sample names as column names
+headers = list(sorted(set(samples), reverse=True))
+headers2write = "Variantid" + "\t" + "\t".join(headers) + "\n"
+g.write(headers2write)
+
+for variant in list(sorted(set(variants))):
+    print(variant)
+    frequencylist = []
+    frequencylist.append(variant)
+    for sample in list(sorted(set(samples), reverse=True)):
+        # check to see if key exst for given variantid sample name combination
+        if (variant, sample) in keylist:
+            frequency = variantsDict[(variant, sample)]
+            frequencylist.append(frequency)
+        else:
+            print("not in keylist")
+            frequencylist.append("")
+    frequencylist.append("\n")
+    print(frequencylist)
+    # convert to string for writing
+    frequencylist = [str(i) for i in frequencylist]
+    line2write = "\t".join(frequencylist)
+    #print(line2write)
+    g.write(line2write)
+g.close()
+f.close()    
+
+   
+print("################ Part 3 #################")
+
+t = open(outfile2, 'w')
+
+for variant in list(sorted(set(variants))):
+    s = open(outfile, 'r')
+    samplelist = []
+    linelist = []
+    experimentlist = []
+    print("Working with variant: %s"  %variant)
+    for line in s:
+        fields = line.split("\t")
+        print("This is fields: %s" %fields)
+        variantid = fields[0]
+        samplename = fields[2]
+        experiment = fields[1]
+        print("this is variant: %s" %variantid)
+        if variant == variantid:
+            samplelist.append(samplename)
+            print(samplelist)
+            experimentlist.append(experiment)
+            linelist.append(line)
+    #uniqueline = "\t".join(linelist[0])
+    uniquesamples = ":".join(samplelist)
+    line2write = variant + "\t" + uniquesamples + "\t" +  "\n"#uniqueline + "\n"
+    t.write(line2write)
+t.close()    
+        
+    
+       
+
+
+
+
     
 #
 ## Open variant file and loop through each variant to create a variantList

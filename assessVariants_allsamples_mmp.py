@@ -13,23 +13,40 @@
 from __future__ import division
 import glob, sys
 #import pandas as pd
+## DVH
+# variantFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
+# fastaFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
+# outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
+# mutationnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
+# cellnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
+# mutationmatrix = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
 
-variantFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/dvh-UA3-152-03and09-singlecell-variants-2callers-80percent-2cells_noan-bed.txt"
-fastaFile = "/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/reference/Desulfovibrio_vulgaris_str_hildenborough.GCA_000195755.1.30.dna.genome.fasta"
-outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_counts_verified.txt'
-mutationnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_names.txt'
-cellnames = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_cell_names.txt'
-mutationmatrix = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/dvh-UA3-152-03and09_allsamples_mutation_matrix.txt'
+## Mmp
+variantFile = "/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/mmp-UA3-03and09-Final-Merged-Variant-2morecells_80percent-bed.txt"
+fastaFile = "/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/reference/Methanococcus_maripaludis_s2.GCA_000011585.1.30.dna.genome.fasta"
+outfile = '/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/mmp-UA3-03and09_allsamples_mutation_counts_verified.txt'
+mutationnames = '/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/mmp-UA3-03and09_allsamples_mutation_names.txt'
+cellnames = '/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/mmp-UA3-03and09_allsamples_cell_names.txt'
+mutationmatrix = '/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/mmp-UA3-03and09_allsamples_mutation_matrix.txt'
+
+
+
 
 # test
 #paths = ["/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03_11*/"]
-
+# dvh paths
 # paths for all sample folders
-paths = [#"/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-03/dvh/DvH_03*/",
+#paths = ["/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/results-UA3-152-03/*_mmp/DvH_03*/",
          #"/Volumes/omics4tb/sturkarslan/dvh-coculture-rnaseq/dvh-single-cells/results-09/dvh/DvH_09*/",
          #"/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
-         "/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/dvh/*/"]
+         #"/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/dvh/*/"]
          #"/Volumes/omics4tb/sturkarslan/clonal-isolates/results/dvh/*/"]
+
+
+# mmp paths
+# paths for all sample folders
+paths = ["/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/results-UA3-152-03/mmp/*_Mmp_*/", "/Volumes/omics4tb/sturkarslan/singleCell-UA3-mmp/results-UA3-152-09/mmp/*_Mmp_*/"]
+
 
 # create a list of all folders from these paths
 folders = []
@@ -68,6 +85,7 @@ headerlist = []
 headerlist.append("Variant")
 
 for cfile in countfiles:
+    print(cfile)
     if cfile[0].split("/")[6] == "dvh":
         headername = cfile[0].split("/")[7].split("_allsamples_bamreadcount_parsed.txt")[0] + "-" + cfile[0].split("/")[4].split("_allsamples_bamreadcount_parsed.txt")[0]
 
