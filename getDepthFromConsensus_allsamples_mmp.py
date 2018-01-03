@@ -278,4 +278,4 @@ for folder in folderlist:
     print
     parseCounts()
     n = n + 1
-    sys.exit()
+    #sys.exit()
