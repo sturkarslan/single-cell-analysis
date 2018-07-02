@@ -62,6 +62,7 @@ print("Procesing counts files...\n")
 countfiles = []
 for folder in folderlist:
     myfile = glob.glob(folder + "*_allsamples_bamreadcount.txt")
+    print(myfile)
     countfiles.append(myfile)
 
 # Open variant file and loop through each variant to create a variantList
@@ -86,7 +87,7 @@ headerlist.append("Variant")
 
 for cfile in countfiles:
     print(cfile)
-    if cfile[0].split("/")[6] == "dvh":
+    if cfile[0].split("/")[6] == "mmp":
         headername = cfile[0].split("/")[7].split("_allsamples_bamreadcount_parsed.txt")[0] + "-" + cfile[0].split("/")[4].split("_allsamples_bamreadcount_parsed.txt")[0]
 
     if cfile[0].split("/")[7] == "dvh":
@@ -211,17 +212,17 @@ for variant2 in variantList:
             # mutation can not be called
             else:
                 status = "3"
-
+            print(status)
             ## Do mutation presence/absence calls agree?
             if status == "3":
                 status = "3"
             else:
                 verify1 = status.split("|")[4]
                 verify2 = status.split("|")[5]
-            if verify1 == verify2:
-                status = status + "|OK"
-            else:
-                status = status + "|CHECK"
+                if verify1 == verify2:
+                    status = status + "|OK"
+                else:
+                    status = status + "|CHECK"
 
             m = m + 1
             statusList.append(status)

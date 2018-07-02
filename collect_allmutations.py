@@ -1,21 +1,24 @@
 
 ############# Serdar Turkarslan / Institute for Systems Biology ###############
-# Last update: 11/07/2017
+# Last update: 03/01/2018
 ###############################################################################
-# Collect all mutations in EPDs and pouplations into a single file
+# Collect all mutations in EPDs, clonal isolate, 1000-gen, clonal isolates
+# and ancestors into a single attributes, collated and matrix files
 ###############################################################################
 from __future__ import division
 import glob, sys
 #import pandas as pd
-
-outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecell_mmp.txt'
-outfile2 = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecell_collated_mmp.txt'
+runDate = "03282018"
+outfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/Mmp_mutations_allsamples_attributes_' + runDate + '.txt'
+outfile2 = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/Mmp_mutations_allsamples_collated_' + runDate + '.txt'
 
 # paths for all sample folders
-paths = ["/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/mmp/*/",
+paths = [#"/Volumes/omics4tb/sturkarslan/EPD/evolved_lines/after_300g/results/dvh/*/",
          "/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/mmp/*/",
          "/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/*/",
-         "/Volumes/omics4tb/sturkarslan/syntrophy_raw_sequences/1000-gen/results/mmp/*/"]
+         "/Volumes/omics4tb/sturkarslan/syntrophy_raw_sequences/1000-gen/results/mmp/*/",
+         "/Volumes/omics4tb/sturkarslan/syntrophy_raw_sequences/Ancestors/results/mmp/*/",
+         "/Volumes/omics4tb/sturkarslan/syntrophy_raw_sequences/Early-Gen/results/mmp/*/"]
 
 # create a list of all folders from these paths
 folders = []
@@ -25,10 +28,10 @@ for path in paths:
 
 ## Remove unwanted folders from the list
 exception = ["AK_43", "AK_44", "AK_47", "AK_48", "AK_49"]
-exceptionfull = ["/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/" + i + "/" for i in exception ]    
+exceptionfull = ["/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/" + i + "/" for i in exception ]
 # create a flat list out of nested lists
 folderlistfull = [item for sublist in folders for item in sublist]
-folderlist = [j for j in folderlistfull if j not in exceptionfull]
+folderlist = iter([j for j in folderlistfull if j not in exceptionfull])
 # file to get list of all variants in all single cells
 # count files
 print("Procesing counts files...\n")
@@ -38,24 +41,52 @@ def mean(numbers):
     return round(float(sum(numbers)) / max(len(numbers), 1), 2)
 
 h = open(outfile, 'w')
+headernames = ["variant_id","experiment","sample","source","position","initial_nt_1st","initial_nt","changed_nt","mutation","effect","type","codon_change","aa_change","gene_id","region","freq","predictor","freq_predictor","read_number","\n"]
+headerline = "\t".join(headernames)
+h.write(headerline)
 samplenames = []
 #countfiles = []
 for folder in folderlist:
+    # remove EPD HA2, HR2 and UA3 lines that are actuall 1000-gen samples
+    folderExceptions = ['HA2','HR2','UA3','CI_36','CI_37']
+    excludedFolders = []
+    for exception in folderExceptions:
+        if exception == ('CI_36' or 'CI_37'):
+            excludedFolders.append("/Volumes/omics4tb/sturkarslan/clonal-isolates/results/mmp/%s/" %(exception))
+        else:
+            excludedFolders.append("/Volumes/omics4tb/sturkarslan/EPD/EPD_seq/results/mmp/%s/" %(exception))
+    print
+    print(excludedFolders)
+    print
+    if folder in excludedFolders:
+        print('Found exception folder: %s' %folder)
+        next(folderlist)
+        continue
+    #sys.exit()
     variantfile = glob.glob(folder + "*.consensus.variants.FINAL.txt")
     samplename = variantfile[0].split("/")[-2]
     experiment = variantfile[0].split("/")[-5]
     if experiment == "after_300g":
-        samplenameCut = samplename.split("_")[0] 
+        samplenameCut = samplename.split("_")[0]
         samplenameClean = "EG_" + samplenameCut
+    elif experiment == "EPD_seq" and samplename == "00_S7":
+        samplenameClean = "AN_" + samplename + "_Stahl"
+        experiment = "Ancestors"
     elif experiment == "EPD_seq":
         samplenameClean = "EP_" + samplename
     elif experiment == "clonal-isolates":
         samplenameClean = "CI_" + samplename
     elif experiment == "1000-gen":
         samplenameClean = "TG_" + samplename
+    elif experiment == "Ancestors":
+        samplenameClean = "AN_" + samplename
+    elif experiment == "Early-Gen":
+        print(samplename)
+        samplenameCut = samplename.split("_")[1]
+        samplenameClean = "EG_" + samplenameCut
     else:
         samplenameClean = samplename
-        
+
     f = open(variantfile[0], 'r')
     # loop through each line
     for line in f:
@@ -64,30 +95,36 @@ for folder in folderlist:
         chromosome = chromosome.replace("Chromosome", "Chr")
         coordinate = fields[1]
         alternative = fields[2]
-        
+
         sysname = fields[10]
         if sysname == "":
             locus = "IG"
         else:
             locus = sysname.replace("DVU_", "DVU")
-        
+
         programs = fields[13]
-        
+
         variantname = "%s-%s-%s" %(chromosome,locus,coordinate)
         programcount = len(programs.split(":"))
         print(programs, programcount)
-        
+
+        #remove first reference base position column
+        #del fields[2]
+        #print(fields)
+        #line2 = str(("\t").join(fields))
+
         if programcount >= 2:
             line2write = variantname + "\t" + experiment + "\t" + samplenameClean + "\t" + line
             h.write(line2write)
             samplenames.append(samplenameClean)
-h.close()    
+h.close()
 
 
 ## create a matrix of mutation frequencies per sample
-matrixfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/allmutations_exceptsinglecells_matrix_mmp.txt'
+matrixfile = '/Volumes/omics4tb/sturkarslan/dvh-mutation-verifications/Mmp_mutations_allsamples_matrix_' + runDate + '.txt'
 f = open(outfile, 'r')
 g = open(matrixfile, 'w')
+next(f)
 variants = []
 samples = []
 frequencies = []
@@ -96,17 +133,18 @@ for line in f:
     fields = line.split("\t")
     variantid = fields[0]
     samplename = fields[2]
-    
+
     frequencies = fields[17]
     frequencies = frequencies.replace("%", "")
     frequencies = list(frequencies.split(":"))
+    print(frequencies)
     #convert to float
     frequencies = [float(i) for i in frequencies]
     meanFreq = mean(frequencies)
     variantsDict[(variantid, samplename)] = meanFreq
     variants.append(variantid)
     samples.append(samplename)
-# get list of keys to check if sample/variant exists    
+# get list of keys to check if sample/variant exists
 keylist = list(variantsDict.keys())
 
 # write sample names as column names
@@ -134,9 +172,9 @@ for variant in list(sorted(set(variants))):
     #print(line2write)
     g.write(line2write)
 g.close()
-f.close()    
+f.close()
 
-   
+
 print("################ Part 3 #################")
 
 t = open(outfile2, 'w')
@@ -163,15 +201,15 @@ for variant in list(sorted(set(variants))):
     uniquesamples = ":".join(samplelist)
     line2write = variant + "\t" + uniquesamples + "\t" +  "\n"#uniqueline + "\n"
     t.write(line2write)
-t.close()    
-        
-    
-       
+t.close()
 
 
 
 
-    
+
+
+
+
 #
 ## Open variant file and loop through each variant to create a variantList
 #print("Procesing variants file...\n")
@@ -196,13 +234,13 @@ t.close()
 #for cfile in countfiles:
 #    if cfile[0].split("/")[6] == "dvh":
 #        headername = cfile[0].split("/")[7].split("_allsamples_bamreadcount_parsed.txt")[0] + "-" + cfile[0].split("/")[4].split("_allsamples_bamreadcount_parsed.txt")[0]
-#        
+#
 #    if cfile[0].split("/")[7] == "dvh":
 #        headername = cfile[0].split("/")[8].split("_allsamples_bamreadcount_parsed.txt")[0].split("-")[0]
-#     
+#
 #    if cfile[0].split("/")[6] == "after_300g":
 #        headername = cfile[0].split("/")[9].split("_allsamples_bamreadcount_parsed.txt")[0].split("_")[0]
-#    
+#
 #    #print(headername)
 #    headerlist.append(headername)
 #headerlist.append("\n")
@@ -231,21 +269,21 @@ t.close()
 ## loop through each variant and search each count file to collect mutations status
 #for variant2 in variantList:
 #    totalvariants = len(variantList)
-#    print("--------------------%s/%s--------------------" %(n,totalvariants)) 
-#    print("Processing %s..." %(variant2)) 
+#    print("--------------------%s/%s--------------------" %(n,totalvariants))
+#    print("Processing %s..." %(variant2))
 #    print
 #    statusList = []
 #    matrixList = []
 #    variant = variant2.split("_")[0]
 #    variant2 = variant2.replace("\n", "")
 #    statusList.append(variant2)
-#    
+#
 #    # loop through each single cell folder to read bmreadcount files and parse
 #    m = 1
 #    totalfolders = len(folderlist)
 #    for folder in folderlist:
-#            print("----------%s/%s----------" %(m,totalfolders)) 
-#            print("Processing %s..." %(folder)) 
+#            print("----------%s/%s----------" %(m,totalfolders))
+#            print("Processing %s..." %(folder))
 #            print
 #            # get count file
 #            bamFile = glob.glob(folder + "*_marked.bam")[0]
@@ -253,7 +291,7 @@ t.close()
 #            sample = bamFile.split("_marked.bam")[0]
 #            countFile = sample + "_allsamples_bamreadcount.txt"
 #            resultFile = countFile.split("_allsamples_bamreadcount.txt")[0] + "_allsamples_bamreadcount_parsed.txt"
-#            
+#
 #            # create a list of variants from consesnus variant calls for each folder
 #            consensusList = []
 #            k = open(consensusVariant, 'r')
@@ -271,7 +309,7 @@ t.close()
 #                #alt = row[15]
 #                joint = "%s-%s-%s" %(chromosome, coord, reference)
 #                consensusList.append(joint)
-#            
+#
 #
 #            # create a dictionary of mutations as keys and status as values
 #            countDict = {}
@@ -304,8 +342,8 @@ t.close()
 #            if variant in consensusList:
 #                status = countDict[variant] + "|1"
 #                print("%s in consensusList" %variant)
-#            
-#            # mutation is not    
+#
+#            # mutation is not
 #            elif variant in keylist:
 #                print("%s in keyList" %variant)
 #                verify = int(countDict[variant].split("|")[3])
@@ -315,11 +353,11 @@ t.close()
 #                else:
 #                    status = countDict[variant] + "|3"
 #                    print("%s is LOWER than 5" %verify)
-#                
+#
 #            # mutation can not be called
 #            else:
 #                status = "3"
-#            
+#
 #            ## Do mutation presence/absence calls agree?
 #            if status == "3":
 #                status = "3"
@@ -330,7 +368,7 @@ t.close()
 #                status = status + "|OK"
 #            else:
 #                status = status + "|CHECK"
-#            
+#
 #            m = m + 1
 #            statusList.append(status)
 #            matrixList.append(status)
@@ -345,7 +383,7 @@ t.close()
 #    h.write(line2write)
 #    ## for matrix and names
 #    vwrite = "\t".join(matrixList) + "\n" ## for matrix ony
-#  
+#
 #    v.write(vwrite)
 #h.close()
 #v.close()
